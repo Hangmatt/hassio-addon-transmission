@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
+- Documented the requirement to update this changelog with every version, commit, and push.
 - Maintained multi-path OpenVPN configuration support.
 - Maintained restrictive permissions for generated VPN credentials.
 - Updated repository and add-on metadata for the Hangmatt fork.
