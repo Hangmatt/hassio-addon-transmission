@@ -1,12 +1,10 @@
 #!/usr/bin/with-contenv bashio
-set -euo pipefail
 # ==============================================================================
 
 declare CONFIG
 declare authentication_required
 declare username
 declare password
-declare direct_access
 declare download_dir
 declare incomplete_dir
 
@@ -29,13 +27,6 @@ CONFIG=$(bashio::jq "${CONFIG}" ".\"download-dir\"=\"${download_dir}\"")
 CONFIG=$(bashio::jq "${CONFIG}" ".\"rpc-whitelist-enabled\"=false")
 CONFIG=$(bashio::jq "${CONFIG}" ".\"rpc-host-whitelist-enabled\"=false")
 CONFIG=$(bashio::jq "${CONFIG}" ".\"bind-address-ipv4\"=\"0.0.0.0\"")
-
-direct_access=$(bashio::config 'direct_access')
-if [[ "${direct_access}" = true ]]; then
-  CONFIG=$(bashio::jq "${CONFIG}" ".\"rpc-bind-address\"=\"0.0.0.0\"")
-else
-  CONFIG=$(bashio::jq "${CONFIG}" ".\"rpc-bind-address\"=\"127.0.0.1\"")
-fi
 
 authentication_required=$(bashio::config 'authentication_required')
 CONFIG=$(bashio::jq "${CONFIG}" ".\"rpc-authentication-required\"=${authentication_required}")

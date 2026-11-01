@@ -1,27 +1,30 @@
 {
     "name": "Transmission",
-    "version": "0.1.1",
+    "version": "dev-new_config",
     "slug": "transmission",
     "description": "The torrent client for Hass.io with OpenVPN support",
     "url": "https://github.com/Hangmatt/hassio-addon-transmission",
     "webui": "http://[HOST]:[PORT:9091]/transmission/web/",
-    "watchdog": "http://[HOST]:8099/",
     "startup": "services",
-    "init": false,
-    "ingress": true,
+    "ingress": "true",
     "ingress_port": 8099,
     "panel_icon": "mdi:progress-download",
     "arch": [
+        "armhf",
+        "armv7",
         "aarch64",
-        "amd64"
+        "amd64",
+        "i386"
     ],
     "map": [
-        "app_config:ro",
-        "media:rw"
+        "addon_config:rw",
+        "media:rw",
+        "share:rw",
+        "ssl"
     ],
     "boot": "auto",
     "ports": {
-        "9091/tcp": 9091,
+        "9091/tcp": null,
         "51413/tcp": 51413,
         "51413/udp": 51413
     },
@@ -40,15 +43,14 @@
     "homeassistant_api": false,
     "host_network": false,
     "options": {
-        "log_level": "debug",
+        "log_level": "info",
         "authentication_required": false,
         "username": "",
         "password": "",
-        "direct_access": false,
-        "download_dir": "/media/Downloads",
-        "incomplete_dir": "/media/Downloads/incomplete",
+        "download_dir": "/media/downloads",
+        "incomplete_dir": "/media/incomplete",
         "openvpn_enabled": false,
-        "openvpn_config": "nl",
+        "openvpn_config": "",
         "openvpn_username": "",
         "openvpn_password": ""
     },
@@ -57,9 +59,8 @@
         "authentication_required": "bool",
         "username": "str",
         "password": "str",
-        "direct_access": "bool",
-        "download_dir": "match(^\/media)",
-        "incomplete_dir": "match(^\/media)",
+        "download_dir": "match(^\/(share|media))",
+        "incomplete_dir": "match(^\/(share|media))",
         "openvpn_enabled": "bool",
         "openvpn_config": "str",
         "openvpn_username": "str",

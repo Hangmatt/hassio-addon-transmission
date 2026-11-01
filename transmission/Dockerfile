@@ -7,15 +7,10 @@ COPY rootfs /
 
 # Setup base
 RUN apk add --no-cache \
-    coreutils=9.11-r0 \
-    nginx=1.30.6-r0 \
-    transmission-daemon=4.1.2-r0 \
-    openvpn=2.7.7-r0 \
- && chmod -R +x /etc/cont-init.d /etc/services.d \
- && chmod +x /etc/openvpn/*.sh /usr/local/bin/transmission-healthcheck
-
-HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
-    CMD ["/usr/local/bin/transmission-healthcheck"]
+    coreutils \
+    nginx \
+    transmission-daemon \
+    openvpn
 # Small hack needed for ingress support
 #
 # Transmission always uses "transmission" as a subdirectory in the URL, so the web interface can for instance be found at:

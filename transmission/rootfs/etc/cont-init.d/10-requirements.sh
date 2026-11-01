@@ -1,13 +1,7 @@
 #!/usr/bin/with-contenv bashio
-set -euo pipefail
 # ==============================================================================
 # This files check if all user configuration requirements are met
 # ==============================================================================
-
-# Direct LAN access must never disable Transmission authentication.
-if bashio::config.true 'direct_access' && ! bashio::config.true 'authentication_required'; then
-    bashio::exit.nok 'Direct LAN access requires Transmission authentication'
-fi
 
 # Check authentication requirements, if enabled
 if bashio::config.true 'authentication_required'; then
