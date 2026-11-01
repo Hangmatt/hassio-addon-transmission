@@ -2,6 +2,8 @@
 
 The torrent client for Hass.io with OpenVPN support.
 
+Proton's NAT-PMP-assigned port is the authoritative Transmission peer port. The add-on intentionally does not publish fixed `51413` host ports; only Web UI port `9091` is exposed. RPC authentication is enabled by default.
+
 ![Logo](transmission/logo.png?raw=true "Logo")
 
 ## License
