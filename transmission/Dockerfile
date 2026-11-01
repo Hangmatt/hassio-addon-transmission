@@ -10,7 +10,8 @@ RUN apk add --no-cache \
     coreutils \
     nginx \
     transmission-daemon \
-    openvpn
+    openvpn \
+    && chmod -R +x /etc/cont-init.d /etc/services.d
 # Small hack needed for ingress support
 #
 # Transmission always uses "transmission" as a subdirectory in the URL, so the web interface can for instance be found at:
