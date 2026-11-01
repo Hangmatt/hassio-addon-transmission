@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - Hardened Proton NAT-PMP renewal, RPC verification, VPN hook ownership, kill-switch recovery, and health checks.
+- Rewritten the README and add-on guide with step-by-step setup, option explanations, and troubleshooting.
 
 ### Changed
 
