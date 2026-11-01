@@ -1,4 +1,4 @@
-ARG BUILD_FROM=ghcr.io/hassio-addons/base:10.1.0
+ARG BUILD_FROM=ghcr.io/hassio-addons/base:21.0.10
 # hadolint ignore=DL3006
 FROM ${BUILD_FROM}
 
@@ -7,10 +7,15 @@ COPY rootfs /
 
 # Setup base
 RUN apk add --no-cache \
-    coreutils \
-    nginx \
-    transmission-daemon \
-    openvpn
+    coreutils=9.11-r0 \
+    nginx=1.30.6-r0 \
+    transmission-daemon=4.1.2-r0 \
+    openvpn=2.7.7-r0 \
+ && chmod -R +x /etc/cont-init.d /etc/services.d \
+ && chmod +x /etc/openvpn/*.sh /usr/local/bin/transmission-healthcheck
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+    CMD ["/usr/local/bin/transmission-healthcheck"]
 # Small hack needed for ingress support
 #
 # Transmission always uses "transmission" as a subdirectory in the URL, so the web interface can for instance be found at:
@@ -32,7 +37,7 @@ RUN apk add --no-cache \
 #
 # This will not work. The sed statement below changes the way the RPC endpoint is determined by keeping the regular endpoint
 # when accessing transmission as usual, but stripping the relative part when using ingress.
-RUN sed -i 's|'"'"'\.\./rpc'"'"'|window.location.pathname.endsWith("/web/") ? "../rpc" : "rpc"|' /usr/share/transmission/web/javascript/remote.js
+# RUN sed -i 's|'"'"'\.\./rpc'"'"'|window.location.pathname.endsWith("/web/") ? "../rpc" : "rpc"|' /usr/share/transmission/web/javascript/remote.js
 
 # Build arugments
 ARG BUILD_ARCH
@@ -47,13 +52,13 @@ LABEL \
     io.hass.arch="${BUILD_ARCH}" \
     io.hass.type="addon" \
     io.hass.version=${BUILD_VERSION} \
-    maintainer="Pierrick Rouxel <pierrickrouxel@addons.community>" \
+    maintainer="Hangmatt <matthijs.pet@gmail.com>" \
     org.label-schema.description="The torrent client for Hass.io" \
     org.label-schema.build-date=${BUILD_DATE} \
     org.label-schema.name="Transmission" \
     org.label-schema.schema-version="1.0" \
-    org.label-schema.url="https://github.com/pierrickrouxel" \
-    org.label-schema.usage="https://github.com/pierrickrouxel/hassio-addon-transmission/tree/master/README.md" \
+    org.label-schema.url="https://github.com/Hangmatt/hassio-addon-transmission" \
+    org.label-schema.usage="https://github.com/Hangmatt/hassio-addon-transmission/tree/master/README.md" \
     org.label-schema.vcs-ref=${BUILD_REF} \
-    org.label-schema.vcs-url="https://github.com/pierrickrouxel" \
+    org.label-schema.vcs-url="https://github.com/Hangmatt/hassio-addon-transmission" \
     org.label-schema.vendor="Community Hass.io Addons"

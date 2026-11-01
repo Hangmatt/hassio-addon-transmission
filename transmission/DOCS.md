@@ -7,7 +7,7 @@ The torrent client for Hass.io with OpenVPN support.
 The installation of this add-on is pretty straightforward and not different in
 comparison to installing any other Hass.io add-on.
 
-1. Add https://github.com/pierrickrouxel/hassio-addon-transmission.git to your Hass.io instance as a repository.
+1. Add https://github.com/Hangmatt/hassio-addon-transmission.git to your Hass.io instance as a repository.
 1. Install the "Transmission" add-on.
 1. Start the "Transmission" add-on.
 1. Check the logs of the "Tranmission" to see if everything went well.
@@ -25,6 +25,7 @@ Transmission add-on configuration:
   "authentication_required": false,
   "username": "",
   "password": "",
+  "direct_access": false,
   "openvpn_enabled": false,
   "openvpn_config": "",
   "openvpn_username": "",
@@ -62,13 +63,26 @@ The username for authentication.
 
 The password for authentication.
 
+### Option: `direct_access`
+
+Controls whether Transmission's Web UI and RPC listener are reachable through
+the published TCP port `9091` from the local network. It defaults to `false`,
+so ingress remains the normal access path. When enabled, authentication must
+also be enabled and configured with a non-empty username and password.
+
+Direct access is available at:
+
+```text
+http://<home-assistant-host>:9091/transmission/web/
+```
+
 ### Option: `openvpn_enabled`
 
 Enable OpenVPN to anonymize your torrent activity.
 
 ### Option: `openvpn_config`
 
-The name of .ovpn file. You should put it in `/config/openvpn`.
+The name of the `.ovpn` file (with or without `.ovpn` extension). You can place it directly in the add-on configuration directory (host path `addon_configs/<slug>/` or `app_configs/<slug>/`, mounted at `/config`), in `/config/openvpn/`, or in `/data/openvpn/`.
 
 ### Option: `openvpn_username`
 
@@ -89,6 +103,19 @@ transmission:
 
 If you want, you can add an icon to the sidebar by toggling *Show in Sidebar* as well.
 
+## Runtime and upgrade notes
+
+This add-on currently builds from `ghcr.io/hassio-addons/base:21.0.10` and
+pins the Alpine packages used by the image. Build and test the target
+architecture before upgrading the base image or package versions. The add-on
+expects a Home Assistant Supervisor environment that provides Bashio's
+`bashio::app.*` functions and s6 service supervision.
+
+After changing add-on options, restart the add-on. After changing the base
+image or package versions, rebuild the image and verify ingress, direct LAN
+access (if enabled), VPN startup, VPN reconnect, and VPN-down behavior before
+deploying it to a production Home Assistant instance.
+
 ## Changelog & Releases
 
 The format of the log is based on
@@ -107,6 +134,7 @@ based on the following:
 MIT License
 
 Copyright (c) 2018 Pierrick Rouxel
+Copyright (c) 2026 Hangmatt
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

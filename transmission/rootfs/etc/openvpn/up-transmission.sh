@@ -1,11 +1,14 @@
 #!/usr/bin/with-contenv bashio
 # ==============================================================================
-declare CONFIG
+# Publishes the current VPN address for the supervised Transmission service.
+# OpenVPN passes the tunnel interface as $1 and the local VPN address as $3.
+# ===============================================================================
+state_dir=/run/transmission
+state_file=${state_dir}/vpn-ip
 
-CONFIG=$(</data/transmission/settings.json)
+mkdir -p "${state_dir}"
+tmp_file=$(mktemp "${state_file}.XXXXXX")
+printf '%s\n' "${3}" > "${tmp_file}"
+mv "${tmp_file}" "${state_file}"
 
-CONFIG=$(bashio::jq "${CONFIG}" ".\"bind-address-ipv4\"=\"${1}\"")
-
-echo "${CONFIG}" > /data/transmission/settings.json
-
-exec /usr/bin/transmission-daemon --foreground --config-dir /data/transmission
+bashio::log.info "VPN is up on ${1} with address ${3}"

@@ -4,8 +4,55 @@
 # ==============================================================================
 bashio::log.info "Starting Transmission..."
 
-if bashio::config.true 'openvpn_enabled'; then
-    exec /usr/sbin/openvpn --config /etc/openvpn/config.ovpn --script-security 2 --up /etc/openvpn/up.sh --down /etc/openvpn/down.sh
-else
+if ! bashio::config.true 'openvpn_enabled'; then
     exec /usr/bin/transmission-daemon --foreground --config-dir /data/transmission
 fi
+
+state_file=/run/transmission/vpn-ip
+transmission_pid=
+
+stop_transmission() {
+    if [[ -n "${transmission_pid}" ]] && kill -0 "${transmission_pid}" 2>/dev/null; then
+        kill "${transmission_pid}" 2>/dev/null || true
+        wait "${transmission_pid}" 2>/dev/null || true
+    fi
+    transmission_pid=
+}
+
+trap 'stop_transmission; exit 0' TERM INT
+trap stop_transmission EXIT
+
+while true; do
+    while [[ ! -s "${state_file}" ]]; do
+        sleep 1
+    done
+
+    bind_address=$(<"${state_file}")
+    if [[ -z "${bind_address}" ]]; then
+        sleep 1
+        continue
+    fi
+
+    CONFIG=$(</data/transmission/settings.json)
+    CONFIG=$(bashio::jq "${CONFIG}" ".\"bind-address-ipv4\"=\"${bind_address}\"")
+    echo "${CONFIG}" > /data/transmission/settings.json
+
+    bashio::log.info "Starting Transmission on VPN address ${bind_address}"
+    /usr/bin/transmission-daemon --foreground --config-dir /data/transmission &
+    transmission_pid=$!
+
+    while kill -0 "${transmission_pid}" 2>/dev/null; do
+        current_address=$(<"${state_file}" 2>/dev/null || true)
+        if [[ "${current_address}" != "${bind_address}" ]]; then
+            bashio::log.info "VPN address changed or disconnected; stopping Transmission"
+            stop_transmission
+            break
+        fi
+        sleep 1
+    done
+
+    if [[ -n "${transmission_pid}" ]]; then
+        wait "${transmission_pid}" 2>/dev/null || true
+        transmission_pid=
+    fi
+done
