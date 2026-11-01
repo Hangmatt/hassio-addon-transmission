@@ -6,8 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-<<<<<<< Updated upstream
-=======
+
+# <<<<<<< Updated upstream
 
 ### Added
 
@@ -26,7 +26,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fixed S6-overlay v3 PID 1 conflict by adding `"init": false` to config.json
 - Fixed service finish handlers by migrating from `s6-svscanctl` to `/run/s6/basedir/bin/halt`
 - # Ensured executable permissions on all service run and finish scripts
->>>>>>> Stashed changes
+  > > > > > > > Stashed changes
+- Modernize to Home Assistant addon_config mapping and add support for /config/, /config/openvpn/, and /data/openvpn/
+- Bump Community Addons base image to 21.0.10 in Dockerfile and build.json
+- Set restrictive file permissions (0600) on OpenVPN credentials
 - Modernize to Home Assistant addon_config mapping and add support for /config/, /config/openvpn/, and /data/openvpn/
 - Bump Community Addons base image to 21.0.10 in Dockerfile and build.json
 - Set restrictive file permissions (0600) on OpenVPN credentials
@@ -34,10 +37,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Install instructions
 - Provide addon as repository
 - Add documentation to embed Transmission in hass
-<<<<<<< Updated upstream
-=======
+  <<<<<<< Updated upstream
+  =======
   > > > > > > > 130677a (Rebrand to Hangmatt fork, modernize addon_config, and bump base image)
->>>>>>> Stashed changes
+  > > > > > > > Stashed changes
 
 ## [1.2.0] - 2018-08-24
 
