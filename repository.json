@@ -1,5 +1,5 @@
 {
   "name": "Transmission repository",
-  "url": "https://github.com/pierrickrouxel/hassio-addon-transmission",
-  "maintainer": "Pierrick Rouxel"
+  "url": "https://github.com/Hangmatt/hassio-addon-transmission",
+  "maintainer": "Hangmatt <matthijs.pet@gmail.com>"
 }

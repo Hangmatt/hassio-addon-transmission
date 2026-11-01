@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Modernize to Home Assistant addon_config mapping and add support for /config/, /config/openvpn/, and /data/openvpn/
+- Bump Community Addons base image to 21.0.10 in Dockerfile and build.json
+- Set restrictive file permissions (0600) on OpenVPN credentials
 - Add images
 - Install instructions
 - Provide addon as repository

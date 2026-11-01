@@ -7,7 +7,7 @@ The torrent client for Hass.io with OpenVPN support.
 The installation of this add-on is pretty straightforward and not different in
 comparison to installing any other Hass.io add-on.
 
-1. Add https://github.com/pierrickrouxel/hassio-addon-transmission.git to your Hass.io instance as a repository.
+1. Add https://github.com/Hangmatt/hassio-addon-transmission.git to your Hass.io instance as a repository.
 1. Install the "Transmission" add-on.
 1. Start the "Transmission" add-on.
 1. Check the logs of the "Tranmission" to see if everything went well.
@@ -68,7 +68,7 @@ Enable OpenVPN to anonymize your torrent activity.
 
 ### Option: `openvpn_config`
 
-The name of .ovpn file. You should put it in `/config/openvpn`.
+The name of the `.ovpn` file (with or without `.ovpn` extension). You can place it directly in the add-on configuration directory (host path `addon_configs/<slug>/` or `app_configs/<slug>/`, mounted at `/config`), in `/config/openvpn/`, or in `/data/openvpn/`.
 
 ### Option: `openvpn_username`
 
@@ -107,6 +107,7 @@ based on the following:
 MIT License
 
 Copyright (c) 2018 Pierrick Rouxel
+Copyright (c) 2026 Hangmatt
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
