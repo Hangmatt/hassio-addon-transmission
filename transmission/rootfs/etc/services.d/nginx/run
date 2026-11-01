@@ -1,11 +1,8 @@
 #!/usr/bin/with-contenv bashio
-set -euo pipefail
 # ==============================================================================
 
 # Wait for transmission to become available
 bashio::net.wait_for 9091
-
-nginx -t -q
 
 bashio::log.info "Starting NGinx..."
 

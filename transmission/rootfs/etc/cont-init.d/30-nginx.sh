@@ -1,34 +1,29 @@
 #!/usr/bin/with-contenv bashio
-set -euo pipefail
 # ==============================================================================
 declare port
+declare certfile
 declare ingress_interface
 declare ingress_port
+declare keyfile
 
-ingress_port=$(bashio::app.ingress_port)
-ingress_interface=$(bashio::app.ip_address)
+port=$(bashio::addon.port 80)
+if bashio::var.has_value "${port}"; then
+    bashio::config.require.ssl
 
-if ! bashio::var.has_value "${ingress_port}"; then
-    bashio::exit.nok 'Ingress is enabled but no ingress port was provided'
+    if bashio::config.true 'ssl'; then
+        certfile=$(bashio::config 'certfile')
+        keyfile=$(bashio::config 'keyfile')
+
+        mv /etc/nginx/servers/direct-ssl.disabled /etc/nginx/servers/direct.conf
+        sed -i "s/%%certfile%%/${certfile}/g" /etc/nginx/servers/direct.conf
+        sed -i "s/%%keyfile%%/${keyfile}/g" /etc/nginx/servers/direct.conf
+
+    else
+        mv /etc/nginx/servers/direct.disabled /etc/nginx/servers/direct.conf
+    fi
 fi
 
-if ! bashio::var.has_value "${ingress_interface}"; then
-    bashio::exit.nok 'Ingress is enabled but no add-on IP address was provided'
-fi
-
-if [[ ! "${ingress_port}" =~ ^[0-9]+$ ]]; then
-    bashio::exit.nok "Invalid ingress port: ${ingress_port}"
-fi
-
-if [[ ! "${ingress_interface}" =~ ^[0-9.]+$ ]]; then
-    bashio::exit.nok "Invalid add-on IP address: ${ingress_interface}"
-fi
-
-sed -i "s|%%port%%|${ingress_port}|g; s|%%interface%%|${ingress_interface}|g" \
-    /etc/nginx/servers/ingress.conf
-
-if grep -q '%%\(port\|interface\)%%' /etc/nginx/servers/ingress.conf; then
-    bashio::exit.nok 'Nginx ingress configuration still contains unresolved placeholders'
-fi
-
-nginx -t -q
+ingress_port=$(bashio::addon.ingress_port)
+ingress_interface=$(bashio::addon.ip_address)
+sed -i "s/%%port%%/${ingress_port}/g" /etc/nginx/servers/ingress.conf
+sed -i "s/%%interface%%/${ingress_interface}/g" /etc/nginx/servers/ingress.conf
