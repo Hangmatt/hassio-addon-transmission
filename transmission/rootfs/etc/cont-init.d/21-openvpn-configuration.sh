@@ -38,6 +38,4 @@ if bashio::config.true 'openvpn_enabled'; then
 
   sed -i 's/auth-user-pass.*/auth-user-pass \/etc\/openvpn\/credentials/g' /etc/openvpn/config.ovpn
 
-  sed -i "1a\/etc/openvpn/up-transmission.sh \"\${4}\" &\n" /etc/openvpn/up.sh
-
 fi

@@ -1,128 +1,54 @@
-# Transmission addon for Hass.io
+# Transmission Home Assistant add-on
 
-The torrent client for Hass.io with OpenVPN support.
+Transmission torrent client with optional Proton VPN OpenVPN protection, Home Assistant ingress, and local web access.
 
 ## Installation
 
-The installation of this add-on is pretty straightforward and not different in
-comparison to installing any other Hass.io add-on.
+1. Open **Settings → Add-ons → Add-on store → ⋮ → Repositories**.
+2. Add `https://github.com/Hangmatt/hassio-addon-transmission`.
+3. Install **Transmission**, configure it, then start it.
+4. Open the add-on **Web UI** or show it in the Home Assistant sidebar.
 
-1. Add https://github.com/Hangmatt/hassio-addon-transmission.git to your Hass.io instance as a repository.
-1. Install the "Transmission" add-on.
-1. Start the "Transmission" add-on.
-1. Check the logs of the "Tranmission" to see if everything went well.
-1. Open the web-ui
+Home Assistant ingress is enabled on internal port `8099`. Transmission web access is also exposed on host port `9091`; use `http://HOME_ASSISTANT_HOST:9091/transmission/web/` from the local network. Do not expose port 9091 directly to the internet.
 
-## Configuration
+## Proton VPN setup
 
-**Note**: _Remember to restart the add-on when the configuration is changed._
+Port forwarding requires a paid Proton VPN plan and a Proton P2P server. Download a Linux OpenVPN `.ovpn` profile for a P2P server. Put it in the add-on configuration directory, mounted as `/config`, or in `/config/openvpn/`. Set `openvpn_config` to its filename, with or without `.ovpn`.
 
-Transmission add-on configuration:
+Use Proton OpenVPN credentials, not normal Proton account credentials. If `port_forwarding` is enabled, append `+pmp` to the OpenVPN username (for example, `username+pmp`). Proton assigns a different public port after reconnecting; the add-on refreshes the NAT-PMP lease and updates Transmission automatically. Disable Transmission router UPnP/NAT-PMP mapping because Proton supplies the mapping.
 
-```json
-{
-  "log_level": "info",
-  "authentication_required": false,
-  "username": "",
-  "password": "",
-  "openvpn_enabled": false,
-  "openvpn_config": "",
-  "openvpn_username": "",
-  "openvpn_password": ""
-}
-```
-
-### Option: `log_level`
-
-The `log_level` option controls the level of log output by the addon and can
-be changed to be more or less verbose, which might be useful when you are
-dealing with an unknown issue. Possible values are:
-
-- `trace`: Show every detail, like all called internal functions.
-- `debug`: Shows detailed debug information.
-- `info`: Normal (usually) interesting events.
-- `warning`: Exceptional occurrences that are not errors.
-- `error`:  Runtime errors that do not require immediate action.
-- `fatal`: Something went terribly wrong. Add-on becomes unusable.
-
-Please note that each level automatically includes log messages from a
-more severe level, e.g., `debug` also shows `info` messages. By default,
-the `log_level` is set to `info`, which is the recommended setting unless
-you are troubleshooting.
-
-### Option: `authentication_required`
-
-This option can be used to password protect the web-ui.
-
-### Option: `username`
-
-The username for authentication.
-
-### Option: `password`
-
-The password for authentication.
-
-### Option: `openvpn_enabled`
-
-Enable OpenVPN to anonymize your torrent activity.
-
-### Option: `openvpn_config`
-
-The name of the `.ovpn` file (with or without `.ovpn` extension). You can place it directly in the add-on configuration directory (host path `addon_configs/<slug>/` or `app_configs/<slug>/`, mounted at `/config`), in `/config/openvpn/`, or in `/data/openvpn/`.
-
-### Option: `openvpn_username`
-
-Your OpenVPN username.
-
-### Option: `openvpn_password`
-
-Your OpenVPN password.
-
-## Embedding into Home Assistant
-
-This addon supports ingress, thus it can simply be integrated into Home Assistant without having to forward any additional ports. Here is an example configuration:
+Example configuration:
 
 ```yaml
-transmission:
-  host: f6fddefc-transmission
+openvpn_enabled: true
+openvpn_config: nl-free-123.protonvpn.udp.ovpn
+openvpn_username: your_openvpn_username+pmp
+openvpn_password: your_openvpn_password
+port_forwarding: true
+kill_switch: true
+authentication_required: true
+username: transmission
+password: choose-a-strong-password
 ```
 
-If you want, you can add an icon to the sidebar by toggling *Show in Sidebar* as well.
+## Options
 
-## Changelog & Releases
+- `openvpn_enabled`: Start Transmission only after the OpenVPN tunnel is up.
+- `kill_switch`: Stop Transmission when the tunnel goes down. Enabled by default.
+- `port_forwarding`: Request and renew Proton NAT-PMP TCP/UDP peer port.
+- `download_dir` and `incomplete_dir`: Must start with `/media` or `/share`.
+- `authentication_required`, `username`, `password`: Protect the Transmission RPC/web client.
 
-The format of the log is based on
-[Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
+Restart the add-on after changing options. Check **Settings → Add-ons → Transmission → Log**. Successful VPN startup logs the tunnel address; successful forwarding logs the assigned peer port.
 
-Releases are based on [Semantic Versioning](http://semver.org/spec/v2.0.0.html), and use the format
-of ``MAJOR.MINOR.PATCH``. In a nutshell, the version will be incremented
-based on the following:
+## Troubleshooting
 
-- ``MAJOR``: Incompatible or major changes.
-- ``MINOR``: Backwards-compatible new features and enhancements.
-- ``PATCH``: Backwards-compatible bugfixes and package updates.
+If VPN startup fails, verify the profile is a Proton P2P profile and credentials are OpenVPN credentials. If NAT-PMP fails, verify the username contains `+pmp`, the server supports port forwarding, and the profile does not use moderate NAT. If ingress works but port 9091 does not, verify the host port is free and the add-on port is exposed.
+
+## Security
+
+Store credentials in add-on options or Home Assistant secrets; never commit them or the `.ovpn` file. Port forwarding exposes Transmission's peer port through Proton, so keep RPC authentication enabled and expose port 9091 only to trusted local networks.
 
 ## License
 
-MIT License
-
-Copyright (c) 2018 Pierrick Rouxel
-Copyright (c) 2026 Hangmatt
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+MIT License. See `LICENSE.md`.

@@ -16,6 +16,8 @@ fi
 
 # Check OpenVPN requirements, if enabled
 if bashio::config.true 'openvpn_enabled'; then
+    declare openvpn_username
+    openvpn_username=$(bashio::config 'openvpn_username')
     if ! bashio::config.has_value 'openvpn_username'; then
         bashio::exit.nok 'OpenVPN is enabled, but no username was specified'
     fi
@@ -47,5 +49,9 @@ if bashio::config.true 'openvpn_enabled'; then
 
     if [[ "${found}" = false ]]; then
         bashio::exit.nok "OpenVPN configuration file not found. Checked: /config/${config_name}.ovpn, /config/openvpn/${config_name}.ovpn, and /data/openvpn/${config_name}.ovpn"
+    fi
+
+    if bashio::config.true 'port_forwarding' && [[ "${openvpn_username}" != *+pmp* ]]; then
+        bashio::log.warning 'Port forwarding enabled, but OpenVPN username does not contain +pmp; Proton will reject NAT-PMP access'
     fi
 fi

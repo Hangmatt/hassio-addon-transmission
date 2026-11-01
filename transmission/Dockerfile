@@ -8,10 +8,11 @@ COPY rootfs /
 # Setup base
 RUN apk add --no-cache \
     coreutils \
+    libnatpmp \
     nginx \
     transmission-daemon \
     openvpn \
-    && chmod -R +x /etc/cont-init.d /etc/services.d
+    && chmod -R +x /etc/cont-init.d /etc/services.d /etc/openvpn/*.sh
 # Small hack needed for ingress support
 #
 # Transmission always uses "transmission" as a subdirectory in the URL, so the web interface can for instance be found at:
